@@ -2,7 +2,7 @@
 dns-dashboard 提供基于DNS日志的信息统计与展示平台
 
 
-### 1. dns服务器虚拟环境(bind9.9)
+### 1. DNS服务运行环境部署(仅用于演示)
 
 所有日志将展示在docker-envirments/logs目录下，该项目将分析该日志的内容，并将结果展示在web系统上
 
@@ -51,5 +51,9 @@ a.dns.test.		86400	IN	A	192.168.0.2
 
 ### 2. DNS发包测试
 
+请参考链接 [dns-loader](https://github.com/zhangmingkai4315/dns-loader)
 
 ### 3. Dashboard展示
+
+
+
