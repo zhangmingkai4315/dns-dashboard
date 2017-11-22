@@ -2,19 +2,20 @@ package web
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"github.com/unrolled/render"
+	"github.com/zhangmingkai4315/dns-dashboard/analyzer"
 	"github.com/zhangmingkai4315/dns-dashboard/utils"
 )
 
 func getStatus(w http.ResponseWriter, req *http.Request) {
 	r := render.New(render.Options{})
-	r.JSON(w, http.StatusOK, map[string]string{"status": "no update"})
+	status := analyzer.GetSystemStatus()
+	r.JSON(w, http.StatusOK, status)
 }
 
 // StartServer will start analyzer and the web serve

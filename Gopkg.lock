@@ -14,6 +14,12 @@
   version = "v1.6.0"
 
 [[projects]]
+  name = "github.com/shirou/gopsutil"
+  packages = ["internal/common","mem"]
+  revision = "48fc5612898a1213aa5d6a0fb2d4f7b968e898fb"
+  version = "v2.17.10"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "418b41d23a1bf978c06faea5313ba194650ac088"
@@ -26,6 +32,12 @@
   revision = "65450fb6b2d3595beca39f969c411db8f8d5c806"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix","windows"]
+  revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
+
+[[projects]]
   name = "gopkg.in/ini.v1"
   packages = ["."]
   revision = "32e4c1e6bc4e7d0d8451aa6b75200d19e37a536a"
@@ -34,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5e3c78c88c103e047d1f4bb9eed82b6410f17af299490504d31d61dee6ab9938"
+  inputs-digest = "8af0866d29735a346e537f335ee14eacef21cf36eb5cc7c93feb083fd6a0a8a8"
   solver-name = "gps-cdcl"
   solver-version = 1
