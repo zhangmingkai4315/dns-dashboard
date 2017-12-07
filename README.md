@@ -9,7 +9,7 @@ dns-dashboard 提供基于DNS日志的信息统计与展示平台
 ```
 cd docker-envirments
 docker build -t dns-bind-log .
-docker run -it -d --name=bind9.9 -v "$PWD/log/dnslog":/var/cache/bind/dnslog dns-bind-log:latest 
+docker run -it -d --name=bind9.9 -v "$PWD/log/dnslog":/var/cache/bind/dnslog dns-bind-log
 ```
 
 测试,请先查询启动的docker的ip地址

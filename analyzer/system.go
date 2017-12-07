@@ -9,20 +9,8 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
-	"github.com/shirou/gopsutil/process"
+	"github.com/zhangmingkai4315/dns-dashboard/utils"
 )
-
-type processInfo struct {
-	Pid         int32                `json:"pid"`
-	Name        string               `json:"name"`
-	ExecPath    string               `json:"exec_path"`
-	Threads     int32                `json:"threads_number"`
-	User        string               `json:"username"`
-	Status      string               `json:"status"`
-	MemoryUsage float32              `json:"memory_percent"`
-	CPUUsage    float64              `json:"cpu_percent"`
-	IOCounter   []net.IOCountersStat `json:"io"`
-}
 
 // SystemStatus define the system status
 type SystemStatus struct {
@@ -41,8 +29,10 @@ type SystemStatus struct {
 	LoadAvg load.AvgStat `json:"load_avg"`
 	// 网络IO操作信息
 	IOState []net.IOCountersStat `json:"network_io"`
-	// 系统进程信息
-	Processes []processInfo `json:"processes"`
+	// 系统进程信息Top10内存
+	ProcessesMemory []utils.Process `json:"processes_memory"`
+	// 系统进程信息Top10CPU
+	ProcessesCPU []utils.Process `json:"processes_cpu"`
 }
 
 // GetSystemStatus will get some system runtime data
@@ -93,30 +83,11 @@ func GetSystemStatus() *SystemStatus {
 	}
 	//获取系统进程信息
 
-	processes, err := process.Processes()
-	pInfos := []processInfo{}
+	processes, err := utils.NewProcessList()
 	if err == nil {
-
-		for _, p := range processes {
-			if p.Pid == 0 {
-				continue
-			}
-			name, err := p.Name()
-			if err != nil || name == "" {
-				continue
-			}
-			info := processInfo{}
-			info.Pid = p.Pid
-			info.Name, _ = p.Name()
-			info.ExecPath, _ = p.Exe()
-			info.Status, _ = p.Status()
-			info.CPUUsage, _ = p.CPUPercent()
-			info.IOCounter, _ = p.NetIOCounters(false)
-			info.Threads, _ = p.NumThreads()
-			info.MemoryUsage, _ = p.MemoryPercent()
-			pInfos = append(pInfos, info)
-		}
-		systemStatus.Processes = pInfos
+		// 默认仅仅获取前10条 内存占用最大的进程
+		systemStatus.ProcessesMemory, _ = processes.SortByMem(10, true)
+		systemStatus.ProcessesCPU, _ = processes.SortByCPU(10, true)
 	}
 	return systemStatus
 }

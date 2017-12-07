@@ -2,6 +2,7 @@
 package utils
 
 import (
+	"errors"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -59,11 +60,20 @@ func (pl *ProcessList) GetProcesses() error {
 			p.PID, _ = strconv.Atoi(processItemList[0])
 			p.PPID, _ = strconv.Atoi(processItemList[1])
 			p.Command = processItemList[2]
-			p.Memory, _ = strconv.ParseFloat(string(processItem[3]), 32)
-			p.CPU, _ = strconv.ParseFloat(string(processItem[4]), 32)
+			memory, err := strconv.ParseFloat((processItemList[3]), 64)
+			if err == nil {
+				p.Memory = memory
+			} else {
+				p.Memory = 0.0
+			}
+			cpu, err := strconv.ParseFloat((processItemList[4]), 64)
+			if err == nil {
+				p.CPU = cpu
+			} else {
+				p.CPU = 0.0
+			}
 			pl.Processes = append(pl.Processes, p)
 		}
-
 	}
 	return nil
 }
@@ -75,24 +85,46 @@ func (pl *ProcessList) Number() int {
 
 // SortByMem define the sort func to sort the process
 // with memory usage
-func (pl *ProcessList) SortByMem(size int, desc bool) []*Process {
-	sort.Slice(pl.Processes, func(i, j int) bool {
+func (pl *ProcessList) SortByMem(size int, desc bool) ([]Process, error) {
+	if len(pl.Processes) == 0 {
+		return nil, errors.New("empty list")
+	}
+	tempList := []Process{}
+	for _, item := range pl.Processes {
+		temp := *item
+		tempList = append(tempList, temp)
+	}
+	sort.Slice(tempList, func(i, j int) bool {
 		if desc == true {
-			return pl.Processes[i].Memory > pl.Processes[j].Memory
+			return tempList[i].Memory > tempList[j].Memory
 		}
-		return pl.Processes[i].Memory < pl.Processes[j].Memory
+		return tempList[i].Memory < tempList[j].Memory
 	})
-	return pl.Processes[:size]
+	if size <= 0 || size >= pl.Number() {
+		return tempList, nil
+	}
+	return tempList[:size], nil
 }
 
 // SortByCPU define the sort func to sort the process
-// with memory usage
-func (pl *ProcessList) SortByCPU(size int, desc bool) []*Process {
-	sort.Slice(pl.Processes, func(i, j int) bool {
+// with cpu usage
+func (pl *ProcessList) SortByCPU(size int, desc bool) ([]Process, error) {
+	if len(pl.Processes) == 0 {
+		return nil, errors.New("empty list")
+	}
+	tempList := []Process{}
+	for _, item := range pl.Processes {
+		temp := *item
+		tempList = append(tempList, temp)
+	}
+	sort.Slice(tempList, func(i, j int) bool {
 		if desc == true {
-			return pl.Processes[i].CPU > pl.Processes[j].CPU
+			return tempList[i].CPU > tempList[j].CPU
 		}
-		return pl.Processes[i].CPU < pl.Processes[j].CPU
+		return tempList[i].CPU < tempList[j].CPU
 	})
-	return pl.Processes[:size]
+	if size <= 0 || size >= pl.Number() {
+		return tempList, nil
+	}
+	return tempList[:size], nil
 }
