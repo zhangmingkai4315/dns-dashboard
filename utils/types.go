@@ -1,5 +1,6 @@
 package utils
 
+// Global config part
 type Global struct {
 	Type   string `ini:"type"`
 	Server string `ini:"server"`
@@ -9,10 +10,12 @@ type Global struct {
 	Grok   string `ini:"grok"`
 }
 
+// DNS config part
 type DNS struct {
 	Grok string `ini:"grok"`
 }
 
+// Config from config.ini
 type Config struct {
 	Global
 	DNS

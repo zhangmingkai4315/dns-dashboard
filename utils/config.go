@@ -2,19 +2,29 @@ package utils
 
 import (
 	"errors"
+	"os"
 
 	ini "gopkg.in/ini.v1"
 )
 
-var global_config *Config
+var globalConfig *Config
 
-func GetConfig() (*Config, error) {
-	if global_config != nil {
-		return nil, errors.New("not ready yet")
+func init() {
+	// if config exist then load the config.ini
+	if _, err := os.Stat("../config.ini"); err == nil {
+		globalConfig, _ = LoadConfigFromFile("../config.ini")
 	}
-	return global_config, nil
 }
 
+// GetConfig will get the global config from module
+func GetConfig() (*Config, error) {
+	if globalConfig != nil {
+		return nil, errors.New("config not ready yet")
+	}
+	return globalConfig, nil
+}
+
+// LoadConfigFromFile will load config from file
 func LoadConfigFromFile(file string) (*Config, error) {
 	cfg, err := ini.Load(file)
 	if err != nil {
@@ -25,6 +35,6 @@ func LoadConfigFromFile(file string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	global_config = config
+	globalConfig = config
 	return config, nil
 }
