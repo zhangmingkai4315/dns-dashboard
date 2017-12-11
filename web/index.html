@@ -1,15 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>DNS-DashBoard</title>
-    </head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DNS-DashBoard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/public/css/theme.css" rel="stylesheet">
+    <link href="/public/css/main.css" rel="stylesheet">
+</head>
 
-    <body>
+<body>
 
+    <body class="nav-md">
+        <div class="container body">
+            <div class="main_container">
+                <div class="col-md-3 left_col">
+                    <div class="left_col scroll-view">
+                        <div class="navbar nav_title" style="border: 0;">
+                            <a href="/" class="site_title"><i class="fa fa-spinner"></i> <span>DNS-DashBoard</span></a>
+                        </div>
+
+                        <div class="clearfix"></div>
+                        <br>
+                        <!-- sidebar menu -->
+                        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                            <div class="menu_section active">
+                                <h3>Mike@CNNIC</h3>
+                                <ul class="nav side-menu">
+                                    <li><a><i class="fa fa-desktop"></i>系统信息 <span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="#system">系统运行状态</a></li>
+                                            <li><a href="#disk">磁盘状态</a></li>
+                                            <li><a href="#network">网络状态</a></li>
+                                            <li><a href="#process">进程状态</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a><i class="fa fa-bar-chart-o"></i> DNS信息 <span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="#top">查询统计</a></li>
+                                            <li><a href="#search">搜索域名</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- /sidebar menu -->
+                    </div>
+                </div>
+                <div class="top_nav">
+                    <div class="nav_menu">
+                        <nav>
+                            <div class="nav toggle">
+                                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                            </div>
+
+                            <ul class="nav navbar-nav navbar-right">
+                                <li class="">
+                                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <img src="/static/images/img.jpg" alt="">Mike
+                                        <span class=" fa fa-angle-down"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                        <li><a href="javascript:;">帮助信息</a></li>
+                                        <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> 退出登入</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="right_col" role="main" style="min-height:837px;">
+                    <div class="row tile_count">
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-user"> Hostname</i> </span>
+                            <div class="count" id="info-hostname">Loading...</div>
+                            <span class="count_bottom">主机标识符</span>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-clock-o"></i> 启动运行时间</span>
+                            <div class="count" id="info-uptime">Loading...</div>
+                            <span class="count_bottom">自上次系统启动至今</span>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-clock-o"></i> 系统进程个数</span>
+                            <div class="count" id="info-procs">Loading...</div>
+                            <span class=" count_bottom ">包含所有系统运行进程</span>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count ">
+                            <span class="count_top "><i class="fa fa-user "></i> 系统运行平台</span>
+                            <div class="count " id="info-platform">Loading...</div>
+                            <span class="count_bottom ">平台系统版本:<i class="green "id="info-platform-version">17.10</i></span>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count ">
+                            <span class="count_top "><i class="fa fa-user "></i> Linux内核版本</span>
+                            <div class="count " id="info-kernel">Loading...</div>
+                            <span class="count_bottom ">内核版本:<i class="green " id="info-kernel-detail"></i></span>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count ">
+                            <span class="count_top "><i class="fa fa-user "></i> 负载级别</span>
+                            <div class="count " id="info-load-1min">0</div>
+                            <span class="count_bottom ">五分钟:<i class="green " id="info-load-5min">0</i> 15分钟:<i class="green " id="info-load-5min">0</i></span>
+                        </div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-12 col-sm-12 col-xs-12 ">
+                            <div class="dashboard_graph">
+
+                                <div class="row x_title ">
+                                    <div class="col-md-6 ">
+                                        <h3>网络连接状态<small> 网卡流量实时展示</small></h3>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                                    <div id="network_plot_01" class="demo-placeholder"></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                                    <div id="network_plot_03" class="demo-placeholder"></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                                    <div id="network_plot_02" class="demo-placeholder"></div>
+                                </div>
+
+                                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                                    <div id="network_plot_04" class="demo-placeholder"></div>
+                                </div>
+
+                            </div>
+
+                            <div class="clearfix "></div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+
+
+
+            </div>
+            <footer>
+
+            </footer>
+        </div>
+        </div>
     </body>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.min.js ">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.js "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js "></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js "></script>
+    <script src="/public/js/lib/spline.min.js ">
+    </script>
+    <script src="/public/js/lib/axislabels.js ">
+    </script>
+    <script src="/public/js/theme.js "></script>
+    <script src="/public/js/main.js "></script>
+</body>
 
 </html>
