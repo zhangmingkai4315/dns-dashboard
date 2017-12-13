@@ -242,6 +242,7 @@ $('.bulk_action input#check-all').on('ifChecked', function() {
 $('.bulk_action input#check-all').on('ifUnchecked', function() {
     checkState = 'none';
     countChecked();
+    gu
 });
 
 function countChecked() {
@@ -339,12 +340,32 @@ var dataStore = {
 var initStatus = {
     networkInitStatus: 0,
     diskInitStatus: 0,
+    memoryInitStatus: 0,
 }
+
+// 管理所有已初始化的组件对象
+var visComponentsManager = {}
 var MaxPoint = 50
 var networkPlot = null
 var queryInterval = 5000
 var now = new Date().getTime();
 
+var gauge_settings = {
+    lines: 12,
+    angle: 0,
+    lineWidth: 0.4,
+    pointer: {
+        length: 0.75,
+        strokeWidth: 0.042,
+        color: '#1D212A'
+    },
+    limitMax: 'false',
+    colorStart: '#1ABC9C',
+    colorStop: '#1ABC9C',
+    strokeColor: '#F0F3F3',
+    generateGradient: true,
+    highDpiSupport: true, // High resolution support
+};
 var networkOptions = {
     series: {
         lines: {
@@ -400,6 +421,18 @@ function tickNetworkFormatter(bps) {
         } else {
             return v + (bps ? "bps" : "pps");
         }
+    }
+}
+
+function formatMemoryUsage(v) {
+    if (v > (1024 * 1024 * 1024)) {
+        return (v / (1024 * 1024 * 1024)).toFixed(1) + "GB";
+    } else if (v > (1024 * 1024)) {
+        return (v / (1024 * 1024)).toFixed(1) + "MB";
+    } else if (v > (1024)) {
+        return (v / (1024)).toFixed(1) + "KB";
+    } else {
+        return v;
     }
 }
 
@@ -511,23 +544,7 @@ var disk_options = {
         defaultTheme: false
     }
 };
-// // 根据采样数据来产生磁盘图表
-// function init_disk_chart(data) {
 
-//     // format data to dataset
-//     var dataSets = formatRawDiskDataToOption(data.disk_usage)
-//     var diskNameList = _.keys(dataSets)
-//     for (var i = 0; i < diskNameList.length; i++) {
-//         var divIdName = "disk_plot_01" + "_" + i
-//         $("#disk_plot_01").append('<div class="col-md-3"><div class="title">' + diskNameList[i] + '</div><div class="dist-item" id=' + divIdName + '></div></div>');
-//         divIdNameSelect = '#' + divIdName
-//             // console.log($(divIdNameSelect), dataSets[diskNameList[i]], options)
-//         $.plot($(divIdNameSelect), dataSets[diskNameList[i]], disk_options);
-//     }
-//     initStatus.diskInitStatus += 1
-// }
-
-// 根据采样数据来更新磁盘图表
 function update_disk_chart(data) {
     if (typeof data.disk_usage === 'undefine' || data.disk_usage.length === 0) {
         console.warn("disk info not ready")
@@ -552,8 +569,6 @@ function update_process_chart(data, selectorID, listTitle) {
         console.log('unable to update process info')
         return
     }
-    console.log(selectorID)
-        // clear old data
     $(selectorID).html('')
     var htmlContent = ''
     for (var i = 0; i < data[listTitle].length; i++) {
@@ -570,6 +585,7 @@ function update_process_chart(data, selectorID, listTitle) {
 
 function parseStatusData(data) {
     // 更新系统基本信息
+    $(".loading").fadeOut("slow")
     baiscStatus(data)
     loadStatus(data)
     now += queryInterval
@@ -584,6 +600,7 @@ function parseStatusData(data) {
         // 更新进程状态
     update_process_chart(data, '#system-process-memory-list', 'processes_memory')
     update_process_chart(data, '#system-process-cpu-list', 'processes_cpu')
+
 
 
 }
@@ -624,6 +641,27 @@ function baiscStatus(data) {
     } else {
         $("#info-platform-version").html("unknown")
     }
+    // update memory info 
+    if (typeof(Gauge) === 'undefined' || typeof data["virtual_memory"] === 'undefine') {
+        return;
+    }
+    if ($('#info-system-memory').length) {
+        var chart_gauge_memory = document.getElementById('info-system-memory');
+        var gauge_memory
+        var used = parseFloat(data["virtual_memory"]["used"])
+        var total = parseFloat(data["virtual_memory"]["total"])
+        if (initStatus.memoryInitStatus === 0) {
+            gauge_memory = new Gauge(chart_gauge_memory).setOptions(gauge_settings);
+            gauge_memory.maxValue = total
+            gauge_memory.animationSpeed = 32;
+            visComponentsManager['memoryMeter'] = gauge_memory
+            initStatus.memoryInitStatus = 1
+        }
+
+        visComponentsManager['memoryMeter'].set(used)
+        $("#hover-for-memory").attr('title', formatMemoryUsage(used) + '/' + formatMemoryUsage(total))
+    }
+    return
 }
 
 function loadStatus(data) {
@@ -662,14 +700,14 @@ $(document).ready(function() {
 
 function formatTimeSeconds(seconds) {
     if (seconds > 86400) {
-        return (seconds / 86400).toFixed(2).toString() + " days"
+        return (seconds / 86400).toFixed(2).toString() + " d"
     }
     if (seconds > 3600) {
-        return (seconds / 3600).toFixed(2).toString() + "hours"
+        return (seconds / 3600).toFixed(2).toString() + "h"
     }
 
     if (seconds > 60) {
-        return (seconds / 60).toFixed(2).toString() + "mins"
+        return (seconds / 60).toFixed(2).toString() + "m"
     }
-    return seconds.toString() + "seconds"
+    return seconds.toString() + "s"
 }
