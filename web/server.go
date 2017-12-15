@@ -65,7 +65,7 @@ func StartServer(config *utils.Config) {
 	r.HandleFunc("/status", getStatus).Methods("GET")
 	r.HandleFunc("/dns_init_status", getDNSStatus).Methods("GET")
 	r.HandleFunc("/dns_lastest_status", getLastestDNSStatus).Methods("GET")
-	serverWithPort := fmt.Sprintf("%s:%d", config.Server, config.Port)
+	serverWithPort := fmt.Sprintf("%s:%d", config.Global.Server, config.Global.Port)
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./web/assets"))))
 	log.Printf("Server listen : %s", serverWithPort)
 	http.ListenAndServe(serverWithPort, http.TimeoutHandler(r, time.Second*10, "timeout"))

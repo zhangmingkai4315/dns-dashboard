@@ -38,10 +38,15 @@ func main() {
 		utils.UsageAndExit(fmt.Sprintf("load config file err:%s", err))
 	}
 
+	logFile := *queryLogFile
 	if *queryLogFile == "" {
+		logFile = config.DNS.Path
+	}
+
+	if logFile == "" {
 		utils.UsageAndExit("query file must provided")
 	}
-	manager, err := analyzer.NewDNSStatsManager(*queryLogFile, config.DNS.Grok)
+	manager, err := analyzer.NewDNSStatsManager(logFile, config.DNS.Grok)
 	if err != nil {
 		utils.UsageAndExit(fmt.Sprintf("can't create manager:%s", err))
 	}
