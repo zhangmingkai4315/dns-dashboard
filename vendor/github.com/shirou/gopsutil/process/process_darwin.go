@@ -390,7 +390,7 @@ func (p *Process) MemoryMaps(grouped bool) (*[]MemoryMapsStat, error) {
 	return &ret, common.ErrNotImplementedError
 }
 
-func Processes() ([]Process, error) {
+func processes() ([]Process, error) {
 	results := make([]Process, 0, 50)
 
 	mib := []int32{CTLKern, KernProc, KernProcAll, 0}

@@ -2,6 +2,18 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/StackExchange/wmi"
+  packages = ["."]
+  revision = "ea383cf3ba6ec950874b8486cd72356d007c768f"
+
+[[projects]]
+  name = "github.com/go-ole/go-ole"
+  packages = [".","oleutil"]
+  revision = "0e87ea779d9deb219633b828a023b32e1244dd57"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/gorilla/context"
   packages = ["."]
   revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
@@ -14,10 +26,40 @@
   version = "v1.6.0"
 
 [[projects]]
+  name = "github.com/hpcloud/tail"
+  packages = [".","ratelimiter","util","watch","winfile"]
+  revision = "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/jinzhu/gorm"
+  packages = [".","dialects/sqlite"]
+  revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
+  version = "v1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
+
+[[projects]]
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  revision = "ed69081a91fd053f17672236b0dd52ba7485e1a3"
+  version = "v1.4.0"
+
+[[projects]]
   name = "github.com/shirou/gopsutil"
-  packages = ["internal/common","mem"]
+  packages = ["cpu","disk","host","internal/common","load","mem","net","process"]
   revision = "48fc5612898a1213aa5d6a0fb2d4f7b968e898fb"
   version = "v2.17.10"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shirou/w32"
+  packages = ["."]
+  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -32,10 +74,28 @@
   revision = "65450fb6b2d3595beca39f969c411db8f8d5c806"
 
 [[projects]]
+  name = "github.com/vjeantet/grok"
+  packages = ["."]
+  revision = "ce01e59abcf6fbc9833b7deb5e4b8ee1769bcc53"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "d866cfc389cec985d6fda2859936a575a55a3ab6"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
   revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
+
+[[projects]]
+  name = "gopkg.in/fsnotify.v1"
+  packages = ["."]
+  revision = "629574ca2a5df945712d3079857300b5e4da0236"
+  version = "v1.4.2"
 
 [[projects]]
   name = "gopkg.in/ini.v1"
@@ -43,9 +103,15 @@
   revision = "32e4c1e6bc4e7d0d8451aa6b75200d19e37a536a"
   version = "v1.32.0"
 
+[[projects]]
+  branch = "v1"
+  name = "gopkg.in/tomb.v1"
+  packages = ["."]
+  revision = "dd632973f1e7218eb1089048e0798ec9ae7dceb8"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8af0866d29735a346e537f335ee14eacef21cf36eb5cc7c93feb083fd6a0a8a8"
+  inputs-digest = "afa703af065b8d4107569eec60bf49a94747a80bacf9cfea8edc01fbc34ec016"
   solver-name = "gps-cdcl"
   solver-version = 1
