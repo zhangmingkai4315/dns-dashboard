@@ -16,3 +16,4 @@
 # dns docker logs
 dnslog
 sqlite.db
+sqlite.db-journal

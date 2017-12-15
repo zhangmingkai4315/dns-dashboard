@@ -39,6 +39,21 @@ func getDNSStatus(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func getLastestDNSStatus(w http.ResponseWriter, req *http.Request) {
+	db, err := model.GetDB()
+	r := render.New(render.Options{})
+	if err != nil {
+		r.JSON(w, http.StatusServiceUnavailable, Message{Error: err.Error()})
+		return
+	}
+	var serials model.DNSSerialData
+	if err := db.Order("timestamp desc").Limit(1).Find(&serials).Error; err != nil {
+		r.JSON(w, http.StatusServiceUnavailable, Message{Error: err.Error()})
+	} else {
+		r.JSON(w, http.StatusOK, serials)
+	}
+}
+
 // StartServer will start analyzer and the web serve
 func StartServer(config *utils.Config) {
 	r := mux.NewRouter()
@@ -48,8 +63,8 @@ func StartServer(config *utils.Config) {
 	}).Methods("GET")
 
 	r.HandleFunc("/status", getStatus).Methods("GET")
-	r.HandleFunc("/dns_status", getDNSStatus).Methods("GET")
-
+	r.HandleFunc("/dns_init_status", getDNSStatus).Methods("GET")
+	r.HandleFunc("/dns_lastest_status", getLastestDNSStatus).Methods("GET")
 	serverWithPort := fmt.Sprintf("%s:%d", config.Server, config.Port)
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./web/assets"))))
 	log.Printf("Server listen : %s", serverWithPort)

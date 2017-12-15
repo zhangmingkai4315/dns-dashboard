@@ -63,29 +63,32 @@ type DNSStats struct {
 
 // DNSStatsManager define the manager to
 type DNSStatsManager struct {
-	mutex       sync.Mutex
-	file        *tail.Tail
-	rawChannel  chan string
-	stopChannel chan struct{}
-	startTime   time.Time
-	Timestamp   time.Time
-	worker      int
-	processing  bool
-	stats       DNSStats
-	data        []map[string]map[string]int
-	grok        string
+	mutex             sync.Mutex
+	file              *tail.Tail
+	filePath          string
+	stopWorkerChannel chan struct{}
+	stopReaderChannel chan struct{}
+	startTime         time.Time
+	Timestamp         time.Time
+	worker            int
+	panicWorker       int
+	processing        bool
+	stats             DNSStats
+	data              []map[string]map[string]int
+	grok              string
 }
 
 // NewDNSStatsManager function will generate a new manager
 // to manage the analyz process
 func NewDNSStatsManager(file string, grok string) (*DNSStatsManager, error) {
 	location := &tail.SeekInfo{Offset: 0, Whence: os.SEEK_END}
-	tailFile, err := tail.TailFile(file, tail.Config{Follow: true, Location: location})
+	tailFile, err := tail.TailFile(file, tail.Config{Follow: true, ReOpen: true, Location: location})
 	if err != nil {
 		return nil, err
 	}
-	rawChannel := make(chan string, 1000)
-	stopChannel := make(chan struct{})
+	// 缓存输出
+	stopWorkerChannel := make(chan struct{})
+	stopReaderChannel := make(chan struct{})
 	var data []map[string]map[string]int
 	for i := 0; i < MaxWorkerNumber; i++ {
 		data = append(data, make(map[string]map[string]int))
@@ -94,13 +97,15 @@ func NewDNSStatsManager(file string, grok string) (*DNSStatsManager, error) {
 		return nil, err
 	}
 	return &DNSStatsManager{
-		file:        tailFile,
-		rawChannel:  rawChannel,
-		processing:  false,
-		stopChannel: stopChannel,
-		worker:      MaxWorkerNumber,
-		data:        data,
-		grok:        grok,
+		file:              tailFile,
+		processing:        false,
+		filePath:          file,
+		stopWorkerChannel: stopWorkerChannel,
+		stopReaderChannel: stopReaderChannel,
+		worker:            MaxWorkerNumber,
+		panicWorker:       0,
+		data:              data,
+		grok:              grok,
 	}, nil
 }
 
@@ -108,11 +113,32 @@ func NewDNSStatsManager(file string, grok string) (*DNSStatsManager, error) {
 // and start all works
 func (manager *DNSStatsManager) Start() {
 	manager.data = make([]map[string]map[string]int, MaxWorkerNumber)
-
+	if manager.file == nil {
+		// reopen the file
+		location := &tail.SeekInfo{Offset: 0, Whence: os.SEEK_END}
+		for {
+			tailFile, err := tail.TailFile(manager.filePath, tail.Config{Follow: true, ReOpen: true, Location: location})
+			if err != nil {
+				time.Sleep(time.Second * 1)
+				continue
+			}
+			manager.file = tailFile
+			break
+		}
+	}
 	for i := 0; i < manager.worker; i++ {
 		go func(index int) {
-			manager.mutex.Lock()
-			defer manager.mutex.Unlock()
+			defer func() {
+				manager.mutex.Lock()
+				defer manager.mutex.Unlock()
+				// recover from panic if one occured. Set err to nil otherwise.
+				if err := recover(); err != nil {
+					// log file not exist anyway , try reload it later
+					log.Printf("error occur in work : %s", err)
+					manager.panicWorker = manager.panicWorker + 1
+					return
+				}
+			}()
 			manager.data[index] = make(map[string]map[string]int)
 			manager.data[index]["domain"] = make(map[string]int)
 			manager.data[index]["ip"] = make(map[string]int)
@@ -125,9 +151,9 @@ func (manager *DNSStatsManager) Start() {
 			// process worker will do all data process
 			for {
 				select {
-				case rawText := <-manager.rawChannel:
+				case line := <-manager.file.Lines:
 					// regex process
-					rawInfo, err := manager.getRawFromText(rawText)
+					rawInfo, err := manager.getRawFromText(line.Text)
 					if err != nil {
 						log.Println(err)
 						continue
@@ -137,7 +163,7 @@ func (manager *DNSStatsManager) Start() {
 					subDomainMap[subdomain] = subDomainMap[subdomain] + 1
 					ipMap[rawInfo.IP] = ipMap[rawInfo.IP] + 1
 					typeMap[rawInfo.Type] = typeMap[rawInfo.Type] + 1
-				case <-manager.stopChannel:
+				case <-manager.stopWorkerChannel:
 					return
 				}
 			}
@@ -145,15 +171,11 @@ func (manager *DNSStatsManager) Start() {
 	}
 
 	manager.startTime = time.Now()
-	for line := range manager.file.Lines {
-		manager.rawChannel <- line.Text
-		log.Println(line.Text)
+	for {
 		select {
-		case <-manager.stopChannel:
+		case <-manager.stopReaderChannel:
 			log.Println("reader recive stop signal")
 			return
-		default:
-			continue
 		}
 	}
 }
@@ -162,9 +184,11 @@ func (manager *DNSStatsManager) Start() {
 func (manager *DNSStatsManager) Stop() (*DNSStats, error) {
 	// close read and process worker
 	log.Println("Sending stop signal to all worker and reader goroutine")
-	for i := 0; i < manager.worker+1; i++ {
-		manager.stopChannel <- struct{}{}
+	for i := 0; i < manager.worker-manager.panicWorker; i++ {
+		manager.stopWorkerChannel <- struct{}{}
 	}
+	manager.panicWorker = 0
+	manager.stopReaderChannel <- struct{}{}
 	duration := time.Now().Sub(manager.startTime).Seconds()
 	manager.Timestamp = time.Now()
 	// counts top results
@@ -187,7 +211,7 @@ func (manager *DNSStatsManager) Stop() (*DNSStats, error) {
 		}
 	}
 
-	topDomain := make([]DomainInfo, 0)
+	var topDomain []DomainInfo
 	for k, v := range domainCounts {
 		topDomain = append(topDomain, DomainInfo{k, v})
 	}
