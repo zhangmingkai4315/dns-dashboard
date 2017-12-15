@@ -5,13 +5,14 @@ import (
 	"sync"
 )
 
+// Store 定义一个数据仓库，存储临时使用的数据
 type Store struct {
 	mux  *sync.RWMutex
 	data *list.List
 	max  int
 }
 
-// NewStore return a new store
+// NewStore 创建数据仓库
 func NewStore(max int) *Store {
 	data := list.New()
 	return &Store{
@@ -20,7 +21,7 @@ func NewStore(max int) *Store {
 	}
 }
 
-//GetSome return some data
+//GetSome 返回部分数据集合
 func (s *Store) GetSome(length int) []SystemStatus {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -35,7 +36,7 @@ func (s *Store) GetSome(length int) []SystemStatus {
 	return status
 }
 
-//GetLastOne return only one last data
+//GetLastOne 仅仅返回一个数据集合
 func (s *Store) GetLastOne() (status SystemStatus) {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -46,7 +47,7 @@ func (s *Store) GetLastOne() (status SystemStatus) {
 	return
 }
 
-// Clear remove all the data
+// Clear 删除所有数据集合
 func (s *Store) Clear() {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -55,7 +56,7 @@ func (s *Store) Clear() {
 	}
 }
 
-// Put append a new data to list
+// Put 增加一条新的数据记录
 func (s *Store) Put(status *SystemStatus) bool {
 	s.mux.Lock()
 	defer s.mux.Unlock()

@@ -30,7 +30,7 @@ func NewProcessList() (*ProcessList, error) {
 
 	pl := &ProcessList{
 		processName: "ps",
-		args:        []string{"-eo", "pid,ppid,cmd,%mem,%cpu"},
+		args:        []string{psArgsOne, "pid,ppid,cmd,%mem,%cpu"},
 		Processes:   []*Process{},
 	}
 	err := pl.GetProcesses()

@@ -1,13 +1,13 @@
 package analyzer
 
 import (
-	"log"
 	"os"
 	"sort"
 	"sync"
 	"time"
 
 	"github.com/hpcloud/tail"
+	log "github.com/sirupsen/logrus"
 	"github.com/vjeantet/grok"
 	"github.com/zhangmingkai4315/dns-dashboard/utils"
 )
@@ -19,10 +19,16 @@ var (
 	TopCounts = 10
 )
 
-var g *grok.Grok
+// Grok define global grok object
+var Grok *grok.Grok
 
 func init() {
-	g, _ = grok.New()
+	g, err := grok.New()
+	if err != nil {
+		log.Errorf("load grok error : %s", err)
+	} else {
+		Grok = g
+	}
 }
 
 // IPInfo define the statics data based ip infomation
@@ -174,7 +180,6 @@ func (manager *DNSStatsManager) Start() {
 	for {
 		select {
 		case <-manager.stopReaderChannel:
-			log.Println("reader recive stop signal")
 			return
 		}
 	}
@@ -182,8 +187,6 @@ func (manager *DNSStatsManager) Start() {
 
 // Stop will send stop signal to manage and stop process
 func (manager *DNSStatsManager) Stop() (*DNSStats, error) {
-	// close read and process worker
-	log.Println("Sending stop signal to all worker and reader goroutine")
 	for i := 0; i < manager.worker-manager.panicWorker; i++ {
 		manager.stopWorkerChannel <- struct{}{}
 	}
@@ -263,8 +266,10 @@ func (manager *DNSStatsManager) Stop() (*DNSStats, error) {
 	return stats, nil
 }
 
+// getRawFromText function will process the log file using grok tools
+// return data struct and nil if success
 func (manager *DNSStatsManager) getRawFromText(text string) (*RawInfo, error) {
-	values, err := g.Parse(manager.grok, text)
+	values, err := Grok.Parse(manager.grok, text)
 	if err != nil {
 		return nil, err
 	}

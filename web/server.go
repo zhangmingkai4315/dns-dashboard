@@ -13,17 +13,20 @@ import (
 	"github.com/zhangmingkai4315/dns-dashboard/utils"
 )
 
+// Message 定义基本的response json响应对象
 type Message struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
 }
 
+// getStatus 定义api:/status路由函数，返回系统的实时信息
 func getStatus(w http.ResponseWriter, req *http.Request) {
 	r := render.New(render.Options{})
 	status := analyzer.GetSystemStatus()
 	r.JSON(w, http.StatusOK, status)
 }
 
+// getDNSStatus 定义api:/dns_init_status路由函数,返回dns的信息
 func getDNSStatus(w http.ResponseWriter, req *http.Request) {
 	db, err := model.GetDB()
 	r := render.New(render.Options{})
@@ -39,6 +42,7 @@ func getDNSStatus(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// getLastestDNSStatus 定义api接口函数，返回最新的一条dns的状态信息
 func getLastestDNSStatus(w http.ResponseWriter, req *http.Request) {
 	db, err := model.GetDB()
 	r := render.New(render.Options{})
@@ -54,14 +58,12 @@ func getLastestDNSStatus(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// StartServer will start analyzer and the web serve
+// StartServer 启动web服务器并定义所有路由接口API
 func StartServer(config *utils.Config) {
 	r := mux.NewRouter()
-
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/index.html")
 	}).Methods("GET")
-
 	r.HandleFunc("/status", getStatus).Methods("GET")
 	r.HandleFunc("/dns_init_status", getDNSStatus).Methods("GET")
 	r.HandleFunc("/dns_lastest_status", getLastestDNSStatus).Methods("GET")
