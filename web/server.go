@@ -70,5 +70,5 @@ func StartServer(config *utils.Config) {
 	serverWithPort := fmt.Sprintf("%s:%d", config.Global.Server, config.Global.Port)
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./web/assets"))))
 	log.Printf("Server listen : %s", serverWithPort)
-	http.ListenAndServe(serverWithPort, http.TimeoutHandler(r, time.Second*10, "timeout"))
+	log.Panic(http.ListenAndServe(serverWithPort, http.TimeoutHandler(r, time.Second*10, "timeout")))
 }

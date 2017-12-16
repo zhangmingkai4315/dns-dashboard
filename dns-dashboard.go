@@ -35,7 +35,7 @@ func main() {
 		utils.UsageAndExit("config file must provide")
 	}
 	if _, err := os.Stat(*configFile); os.IsNotExist(err) {
-		utils.UsageAndExit("log file not exist")
+		utils.UsageAndExit("config file not exist")
 	}
 	config, err := utils.LoadConfigFromFile(*configFile)
 	if err != nil {
@@ -60,18 +60,17 @@ func main() {
 		utils.UsageAndExit(fmt.Sprintf("can't create manager:%s", err))
 	}
 
-	ticker := time.NewTicker(time.Microsecond)
 	db, err := model.GetDB()
 	if err != nil {
 		utils.UsageAndExit("DB instance not ready")
 	}
 	// 启动anylyzer每隔五秒将结果写入数据库
 	go func() {
-		for _ = range ticker.C {
+		for {
 			log.Println("Start the dns analyzer processing...")
-			go manager.Start()
+			manager.Start()
 			time.Sleep(time.Second * 5)
-			log.Println("Stop the processing")
+			log.Println("Stop the processing...")
 			stats, err := manager.Stop()
 			if err != nil {
 				log.Errorf("Error when stop the manager %s", err)

@@ -9,6 +9,7 @@ import (
 
 var globalConfig *Config
 
+// 加载配置文件
 func init() {
 	// if config exist then load the config.ini
 	if _, err := os.Stat("../config.ini"); err == nil {

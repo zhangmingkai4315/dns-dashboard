@@ -30,7 +30,7 @@ func NewProcessList() (*ProcessList, error) {
 
 	pl := &ProcessList{
 		processName: "ps",
-		args:        []string{psArgsOne, "pid,ppid,cmd,%mem,%cpu"},
+		args:        []string{psArgsOne, psArgsTwo},
 		Processes:   []*Process{},
 	}
 	err := pl.GetProcesses()
@@ -47,10 +47,12 @@ func (pl *ProcessList) GetProcesses() error {
 	}
 	o, err := exec.Command(pl.processName, pl.args...).Output()
 	if err != nil {
+		println(err.Error())
 		return err
 	}
 	output := strings.Split(string(o), "\n")
 	for i, processItem := range output {
+		// 第一条记录是程序输出内容
 		if i == 0 {
 			continue
 		}

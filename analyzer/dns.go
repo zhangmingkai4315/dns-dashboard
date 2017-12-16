@@ -118,7 +118,9 @@ func NewDNSStatsManager(file string, grok string) (*DNSStatsManager, error) {
 // Start will start to get data from file
 // and start all works
 func (manager *DNSStatsManager) Start() {
+	// 每个work保存自己的数据结果，存储在map对象中
 	manager.data = make([]map[string]map[string]int, MaxWorkerNumber)
+	// 判断文件指针是否为空，如果是则尝试重新打开
 	if manager.file == nil {
 		// reopen the file
 		location := &tail.SeekInfo{Offset: 0, Whence: os.SEEK_END}
@@ -132,6 +134,7 @@ func (manager *DNSStatsManager) Start() {
 			break
 		}
 	}
+	manager.startTime = time.Now()
 	for i := 0; i < manager.worker; i++ {
 		go func(index int) {
 			defer func() {
@@ -158,7 +161,6 @@ func (manager *DNSStatsManager) Start() {
 			for {
 				select {
 				case line := <-manager.file.Lines:
-					// regex process
 					rawInfo, err := manager.getRawFromText(line.Text)
 					if err != nil {
 						log.Println(err)
@@ -169,6 +171,7 @@ func (manager *DNSStatsManager) Start() {
 					subDomainMap[subdomain] = subDomainMap[subdomain] + 1
 					ipMap[rawInfo.IP] = ipMap[rawInfo.IP] + 1
 					typeMap[rawInfo.Type] = typeMap[rawInfo.Type] + 1
+				// 接收到退出信号后退出worker循环
 				case <-manager.stopWorkerChannel:
 					return
 				}
@@ -176,13 +179,6 @@ func (manager *DNSStatsManager) Start() {
 		}(i)
 	}
 
-	manager.startTime = time.Now()
-	for {
-		select {
-		case <-manager.stopReaderChannel:
-			return
-		}
-	}
 }
 
 // Stop will send stop signal to manage and stop process
@@ -191,7 +187,7 @@ func (manager *DNSStatsManager) Stop() (*DNSStats, error) {
 		manager.stopWorkerChannel <- struct{}{}
 	}
 	manager.panicWorker = 0
-	manager.stopReaderChannel <- struct{}{}
+	// manager.stopReaderChannel <- struct{}{}
 	duration := time.Now().Sub(manager.startTime).Seconds()
 	manager.Timestamp = time.Now()
 	// counts top results

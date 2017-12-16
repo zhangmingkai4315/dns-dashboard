@@ -81,8 +81,8 @@ func GetSystemStatus() *SystemStatus {
 	if err == nil {
 		systemStatus.IOState = ioStat
 	}
-	//获取系统进程信息
 
+	//获取系统进程信息
 	processes, err := utils.NewProcessList()
 	if err == nil {
 		// 默认仅仅获取前10条 内存占用最大的进程

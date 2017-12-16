@@ -1,5 +1,6 @@
 package analyzer
 
+// store 存储数据内容，并提供接口供其他组件使用，
 import (
 	"container/list"
 	"sync"
