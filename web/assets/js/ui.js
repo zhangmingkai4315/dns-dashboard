@@ -1,7 +1,7 @@
-(function($, sr) {
+(function ($, sr) {
     // debouncing function from John Hann
     // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
-    var debounce = function(func, threshold, execAsap) {
+    var debounce = function (func, threshold, execAsap) {
         var timeout;
 
         return function debounced() {
@@ -24,7 +24,9 @@
     };
 
     // smartresize 
-    jQuery.fn[sr] = function(fn) { return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+    jQuery.fn[sr] = function (fn) {
+        return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr);
+    };
 
 })(jQuery, 'smartresize');
 
@@ -47,21 +49,22 @@ function getRandomColor() {
     }
     return color;
 }
+PNotify.prototype.options.styling = "dark";
 var BasicColorSets = ['#fad980',
-        '#94bfa2',
-        '#8ba6ca',
-        '#2e8540',
-        '#fdb81e',
-        '#494440',
-        '#5b616b',
-        '#046b99',
-        '#e1f3f8',
-        '#f9dede'
-    ]
-    // Sidebar
+    '#94bfa2',
+    '#8ba6ca',
+    '#2e8540',
+    '#fdb81e',
+    '#494440',
+    '#5b616b',
+    '#046b99',
+    '#e1f3f8',
+    '#f9dede'
+]
+// Sidebar
 function init_sidebar() {
     // TODO: This is some kind of easy fix, maybe we can improve this
-    var setContentHeight = function() {
+    var setContentHeight = function () {
         // reset height
         $RIGHT_COL.css('min-height', $(window).height());
 
@@ -76,12 +79,12 @@ function init_sidebar() {
         $RIGHT_COL.css('min-height', contentHeight);
     };
 
-    $SIDEBAR_MENU.find('a').on('click', function(ev) {
+    $SIDEBAR_MENU.find('a').on('click', function (ev) {
         var $li = $(this).parent();
         $('.side-menu li.active').removeClass("active")
         if ($li.is('.active')) {
             $li.removeClass('active active-sm');
-            $('ul:first', $li).slideUp(function() {
+            $('ul:first', $li).slideUp(function () {
                 setContentHeight();
             });
         } else {
@@ -97,14 +100,14 @@ function init_sidebar() {
             }
             $li.addClass('active');
 
-            $('ul:first', $li).slideDown(function() {
+            $('ul:first', $li).slideDown(function () {
                 setContentHeight();
             });
         }
     });
 
     // toggle small or large menu 
-    $MENU_TOGGLE.on('click', function() {
+    $MENU_TOGGLE.on('click', function () {
         if ($BODY.hasClass('nav-md')) {
             $SIDEBAR_MENU.find('li.active ul').hide();
             $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
@@ -117,20 +120,22 @@ function init_sidebar() {
 
         setContentHeight();
 
-        $('.dataTable').each(function() { $(this).dataTable().fnDraw(); });
+        $('.dataTable').each(function () {
+            $(this).dataTable().fnDraw();
+        });
     });
 
     // check active menu
     $SIDEBAR_MENU.find('a[href="' + CURRENT_URL + '"]').parent('li').addClass('current-page');
 
-    $SIDEBAR_MENU.find('a').filter(function() {
+    $SIDEBAR_MENU.find('a').filter(function () {
         return this.href == CURRENT_URL;
-    }).parent('li').addClass('current-page').parents('ul').slideDown(function() {
+    }).parent('li').addClass('current-page').parents('ul').slideDown(function () {
         setContentHeight();
     }).parent().addClass('active');
 
     // recompute content when resizing
-    $(window).smartresize(function() {
+    $(window).smartresize(function () {
         setContentHeight();
     });
 
@@ -141,24 +146,26 @@ function init_sidebar() {
         $('.menu_fixed').mCustomScrollbar({
             autoHideScrollbar: true,
             theme: 'minimal',
-            mouseWheel: { preventDefault: true }
+            mouseWheel: {
+                preventDefault: true
+            }
         });
     }
 };
-var randNum = function() {
+var randNum = function () {
     return (Math.floor(Math.random() * (1 + 40 - 20))) + 20;
 };
 
 // Panel toolbox
-$(document).ready(function() {
-    $('.collapse-link').on('click', function() {
+$(document).ready(function () {
+    $('.collapse-link').on('click', function () {
         var $BOX_PANEL = $(this).closest('.x_panel'),
             $ICON = $(this).find('i'),
             $BOX_CONTENT = $BOX_PANEL.find('.x_content');
 
         // fix for some div with hardcoded fix class
         if ($BOX_PANEL.attr('style')) {
-            $BOX_CONTENT.slideToggle(200, function() {
+            $BOX_CONTENT.slideToggle(200, function () {
                 $BOX_PANEL.removeAttr('style');
             });
         } else {
@@ -169,7 +176,7 @@ $(document).ready(function() {
         $ICON.toggleClass('fa-chevron-up fa-chevron-down');
     });
 
-    $('.close-link').click(function() {
+    $('.close-link').click(function () {
         var $BOX_PANEL = $(this).closest('.x_panel');
 
         $BOX_PANEL.remove();
@@ -178,7 +185,7 @@ $(document).ready(function() {
 // /Panel toolbox
 
 // Tooltip
-$(document).ready(function() {
+$(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip({
         container: 'body'
     });
@@ -192,10 +199,10 @@ if ($(".progress .progress-bar")[0]) {
 // /Progressbar
 
 // Switchery
-$(document).ready(function() {
+$(document).ready(function () {
     if ($(".js-switch")[0]) {
         var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-        elems.forEach(function(html) {
+        elems.forEach(function (html) {
             var switchery = new Switchery(html, {
                 color: '#26B99A'
             });
@@ -206,9 +213,9 @@ $(document).ready(function() {
 
 
 // iCheck
-$(document).ready(function() {
+$(document).ready(function () {
     if ($("input.flat")[0]) {
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('input.flat').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
                 radioClass: 'iradio_flat-green'
@@ -219,12 +226,12 @@ $(document).ready(function() {
 // /iCheck
 
 // Table
-$('table input').on('ifChecked', function() {
+$('table input').on('ifChecked', function () {
     checkState = '';
     $(this).parent().parent().parent().addClass('selected');
     countChecked();
 });
-$('table input').on('ifUnchecked', function() {
+$('table input').on('ifUnchecked', function () {
     checkState = '';
     $(this).parent().parent().parent().removeClass('selected');
     countChecked();
@@ -232,21 +239,21 @@ $('table input').on('ifUnchecked', function() {
 
 var checkState = '';
 
-$('.bulk_action input').on('ifChecked', function() {
+$('.bulk_action input').on('ifChecked', function () {
     checkState = '';
     $(this).parent().parent().parent().addClass('selected');
     countChecked();
 });
-$('.bulk_action input').on('ifUnchecked', function() {
+$('.bulk_action input').on('ifUnchecked', function () {
     checkState = '';
     $(this).parent().parent().parent().removeClass('selected');
     countChecked();
 });
-$('.bulk_action input#check-all').on('ifChecked', function() {
+$('.bulk_action input#check-all').on('ifChecked', function () {
     checkState = 'all';
     countChecked();
 });
-$('.bulk_action input#check-all').on('ifUnchecked', function() {
+$('.bulk_action input#check-all').on('ifUnchecked', function () {
     checkState = 'none';
     countChecked();
     gu
@@ -275,8 +282,8 @@ function countChecked() {
 
 
 // Accordion
-$(document).ready(function() {
-    $(".expand").on("click", function() {
+$(document).ready(function () {
+    $(".expand").on("click", function () {
         $(this).next().slideToggle(200);
         $expand = $(this).find(">:first-child");
 
@@ -290,11 +297,11 @@ $(document).ready(function() {
 
 // NProgress
 if (typeof NProgress != 'undefined') {
-    $(document).ready(function() {
+    $(document).ready(function () {
         NProgress.start();
     });
 
-    $(window).load(function() {
+    $(window).load(function () {
         NProgress.done();
     });
 }
@@ -302,7 +309,7 @@ if (typeof NProgress != 'undefined') {
 
 //hover and retain popover when on popover content
 var originalLeave = $.fn.popover.Constructor.prototype.leave;
-$.fn.popover.Constructor.prototype.leave = function(obj) {
+$.fn.popover.Constructor.prototype.leave = function (obj) {
     var self = obj instanceof this.constructor ?
         obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type);
     var container, timeout;
@@ -312,11 +319,11 @@ $.fn.popover.Constructor.prototype.leave = function(obj) {
     if (obj.currentTarget) {
         container = $(obj.currentTarget).siblings('.popover');
         timeout = self.timeout;
-        container.one('mouseenter', function() {
+        container.one('mouseenter', function () {
             //We entered the actual popover – call off the dogs
             clearTimeout(timeout);
             //Let's monitor popover content instead
-            container.one('mouseleave', function() {
+            container.one('mouseleave', function () {
                 $.fn.popover.Constructor.prototype.leave.call(self, self);
             });
         });

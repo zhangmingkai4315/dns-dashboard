@@ -50,7 +50,7 @@ var networkOptions = {
     xaxis: {
         mode: "time",
         tickSize: [10, "second"],
-        tickFormatter: function(v, axis) {
+        tickFormatter: function (v, axis) {
             var date = new Date(v);
             if (date.getSeconds() % 60 == 0) {
                 var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
@@ -78,7 +78,9 @@ var networkOptions = {
     grid: {
         hoverable: true,
         borderWidth: 2,
-        backgroundColor: { colors: ["#EDF5FF", "#ffffff"] }
+        backgroundColor: {
+            colors: ["#EDF5FF", "#ffffff"]
+        }
     },
     tooltip: {
         show: true,
@@ -114,7 +116,7 @@ var dnsQueryOptions = {
     xaxis: {
         mode: "time",
         tickSize: [5, "second"],
-        tickFormatter: function(v, axis) {
+        tickFormatter: function (v, axis) {
             var date = new Date(v);
             if (date.getSeconds() % 60 == 0) {
                 var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
@@ -184,7 +186,7 @@ var pie_options = {
 };
 
 function tickNetworkFormatter(bps) {
-    return function(v) {
+    return function (v) {
         if (bps === true) {
             v = v * 8
         }
@@ -218,7 +220,7 @@ function init_network_chart(data, selector, storeName, trafficName, option) {
         console.log("network info not ready")
         return
     }
-    var networkCardsNameList = data.network_io.map(function(item) {
+    var networkCardsNameList = data.network_io.map(function (item) {
         // 初始化数组
         dataStore[storeName][item.name] = []
         for (var i = 0; i < MaxPoint; i++) {
@@ -247,7 +249,7 @@ function update_network_chart(data, selector, storeName, trafficName, updateValu
         init_network_chart(data, selector, storeName, trafficName, option)
         return
     }
-    var networkCardsNameList = data.network_io.map(function(item) {
+    var networkCardsNameList = data.network_io.map(function (item) {
         // 初始化数组
         dataStore[storeName][item.name].shift();
         var value = item[trafficName] - dataStore["lastNetworkValue"][item.name][trafficName]
@@ -334,7 +336,7 @@ function parseStatusData(data) {
     baiscStatus(data)
     loadStatus(data)
     now += queryInterval
-        // 更新网络接口图示
+    // 更新网络接口图示
     update_network_chart(data, $("#network_plot_01"), "networkSend", "bytesSent", false, optionBytesSend);
     update_network_chart(data, $("#network_plot_02"), "networkSendPacket", "packetsSent", false, optionPacketsSend);
     update_network_chart(data, $("#network_plot_03"), "networkRecv", "bytesRecv", false, optionBytesRecv);
@@ -342,7 +344,7 @@ function parseStatusData(data) {
 
     // 更新磁盘使用图示
     update_disk_chart(data)
-        // 更新进程状态
+    // 更新进程状态
     update_process_chart(data, '#system-process-memory-list', 'processes_memory')
     update_process_chart(data, '#system-process-cpu-list', 'processes_cpu')
 
@@ -385,7 +387,7 @@ function baiscStatus(data) {
         $("#info-platform-version").html("unknown")
     }
     // update memory info 
-    if (typeof(Gauge) === 'undefined' || typeof data["virtual_memory"] === 'undefined') {
+    if (typeof (Gauge) === 'undefined' || typeof data["virtual_memory"] === 'undefined') {
         return;
     }
     if ($('#info-system-memory').length) {
@@ -440,7 +442,7 @@ function parseInitDNSStatus(data) {
         return
     }
 
-    data.map(function(item) {
+    data.map(function (item) {
         var temp = item.timestamp.split(' ')
         var timestamp = float5SecondTimeStamp(new Date(temp[0] + ' ' + temp[1])).getTime()
         if (dataStore['lastDNSUpdateTime']) {
@@ -477,7 +479,7 @@ function parseInitDNSStatus(data) {
         }
     })
     var serialData = []
-    _.keys(originalDataMap).map(function(name) {
+    _.keys(originalDataMap).map(function (name) {
         serialData.push({
             data: originalDataMap[name],
             label: name
@@ -619,7 +621,7 @@ function UpdateTopStatus(data) {
         dataStore.currentTotal = total;
         // 更新数据表
         UpdateTableList(type_stats, '#type-top-table', 'type', 'sum')
-            // 更新pie饼图
+        // 更新pie饼图
         UpdatePieComponent(type_stats, '#type-top-doughnut', 'type', 'sum')
     }
 
@@ -663,7 +665,7 @@ function UpdateTopStatus(data) {
             $('#tld-domain-top-cover').hide();
         }
         UpdateTableList(sub_domain_stats, '#tld-domain-top-table', 'domain', 'sum')
-            // 更新pie饼图
+        // 更新pie饼图
         UpdatePieComponent(sub_domain_stats, '#tld-domain-top-doughnut', 'domain', 'sum')
 
     }
@@ -683,31 +685,92 @@ function formatTimeSeconds(seconds) {
     }
     return seconds.toString() + "s"
 }
-$(document).ready(function() { 
+$(document).ready(function () { 
 
     init_sidebar()
     $.ajax({
         dataType: "json",
         url: "/dns_init_status",
-        success: function(data) {
-            parseInitDNSStatus(data)
+        success: function (data) {
+            console.log(data)
+            if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
+                toastr.error(data['error'] || '服务暂时无法访问，请稍后再试', '数据获取失败')
+                return
+            }
+            parseInitDNSStatus(data['data'])
+        },
+        error: function (error) {
+            new PNotify({
+                title: '错误提示',
+                styling: 'bootstrap3',
+                type: "error",
+                text: error['error'] || '服务暂时无法访问，请稍后再试'
+            });
         }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        new PNotify({
+            title: '错误提示',
+            styling: 'bootstrap3',
+            type: "error",
+            text: '网络服务中断，请检查网络连接是否正常'
+        });
     });
-    setInterval(function() {
+    setInterval(function () {
         $.ajax({
             dataType: "json",
             url: "/status",
-            success: function(data) {
-                parseStatusData(data)
+            success: function (data) {
+                console.log(data)
+                if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
+                    toastr.error(data['error'] || '服务暂时无法访问，请稍后再试', '数据获取失败')
+                    return
+                }
+                parseStatusData(data['data'])
+            },
+            error: function (error) {
+                new PNotify({
+                    title: '错误提示',
+                    styling: 'bootstrap3',
+                    type: "error",
+                    text: error['error'] || '服务暂时无法访问，请稍后再试'
+                });
             }
+        }).fail(function () {
+            new PNotify({
+                title: '错误提示',
+                styling: 'bootstrap3',
+                type: "error",
+                text: '网络服务中断，请检查网络连接是否正常'
+            });
         });
         $.ajax({
             dataType: "json",
             url: "/dns_lastest_status",
-            success: function(data) {
-                UpdateDNSStatus(data)
-                UpdateTopStatus(data)
+            success: function (data) {
+                if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
+                    toastr.error(data['error'] || '服务暂时无法访问，请稍后再试', '数据获取失败')
+                    return
+                }
+                console.log(data)
+                UpdateDNSStatus(data['data'])
+                UpdateTopStatus(data['data'])
+            },
+            error: function (error) {
+                new PNotify({
+                    title: '错误提示',
+                    styling: 'bootstrap3',
+                    type: "error",
+                    text: error['error'] || '服务暂时无法访问，请稍后再试'
+                });
             }
+
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            new PNotify({
+                title: '错误提示',
+                styling: 'bootstrap3',
+                type: "error",
+                text: '网络服务中断，请检查网络连接是否正常'
+            });
         });
     }, queryInterval)
 });

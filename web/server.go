@@ -15,15 +15,16 @@ import (
 
 // Message 定义基本的response json响应对象
 type Message struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
+	Error   string      `json:"error"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 // getStatus 定义api:/status路由函数，返回系统的实时信息
 func getStatus(w http.ResponseWriter, req *http.Request) {
 	r := render.New(render.Options{})
 	status := analyzer.GetSystemStatus()
-	r.JSON(w, http.StatusOK, status)
+	r.JSON(w, http.StatusOK, Message{Data: status})
 }
 
 // getDNSStatus 定义api:/dns_init_status路由函数,返回dns的信息
@@ -38,7 +39,7 @@ func getDNSStatus(w http.ResponseWriter, req *http.Request) {
 	if err := db.Order("timestamp desc").Limit(10).Find(&serials).Error; err != nil {
 		r.JSON(w, http.StatusServiceUnavailable, Message{Error: err.Error()})
 	} else {
-		r.JSON(w, http.StatusOK, serials)
+		r.JSON(w, http.StatusOK, Message{Data: serials})
 	}
 }
 
@@ -54,7 +55,7 @@ func getLastestDNSStatus(w http.ResponseWriter, req *http.Request) {
 	if err := db.Order("timestamp desc").Limit(1).Find(&serials).Error; err != nil {
 		r.JSON(w, http.StatusServiceUnavailable, Message{Error: err.Error()})
 	} else {
-		r.JSON(w, http.StatusOK, serials)
+		r.JSON(w, http.StatusOK, Message{Data: serials})
 	}
 }
 
