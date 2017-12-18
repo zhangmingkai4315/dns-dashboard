@@ -40,6 +40,8 @@ func main() {
 	config, err := utils.LoadConfigFromFile(*configFile)
 	if err != nil {
 		utils.UsageAndExit(fmt.Sprintf("load config file err:%s", err))
+	} else {
+		log.Println("load config file sucess")
 	}
 	//日志文件可以从配置文件中获取
 	logFile := *queryLogFile

@@ -2,10 +2,12 @@ package utils
 
 // Global config part
 type Global struct {
-	Type   string `ini:"type"`
-	Server string `ini:"server"`
-	Port   int    `ini:"port"`
-	Grok   string `ini:"grok"`
+	Type     string `ini:"type"`
+	Server   string `ini:"server"`
+	Port     int    `ini:"port"`
+	Secrect  string `ini:"secrect"`
+	Username string `ini:"username"`
+	Password string `ini:"password"`
 }
 
 // DNS config part

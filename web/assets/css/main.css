@@ -1,6 +1,41 @@
 html,
 body {
     height: 100%;
+    overflow-x: hidden;
+}
+
+.container-fluid {
+    padding: 0;
+}
+
+.login>.navbar.navbar-default {
+    background: #2b3f54;
+    border-color: #2b3f54;
+    border-radius: 0;
+    color: white;
+}
+
+.login>.nav.navbar-nav>li>a {
+    color: white!important;
+}
+
+.login>.navbar-brand {
+    position: relative;
+    z-index: 2;
+    color: #ffffff!important;
+}
+
+.login>.navbar-nav.navbar-right .btn {
+    position: relative;
+    z-index: 2;
+    padding: 4px 20px;
+    margin: 10px auto;
+    transition: transform 0.3s;
+}
+
+.login>.navbar .navbar-collapse {
+    position: relative;
+    overflow: hidden !important;
 }
 
 .full-width {
@@ -9,6 +44,10 @@ body {
 
 .full-height {
     height: 100%;
+}
+
+.vertical-offset-100 {
+    padding-top: 100px;
 }
 
 .daterangepicker .ranges li {
@@ -214,11 +253,12 @@ body {
     margin: 13px 0 0 3px
 }
 
-.site_title i {
+
+/* .site_title i {
     border: 1px solid #EAEAEA;
     padding: 5px 6px;
     border-radius: 50%
-}
+} */
 
 .site_title img {
     max-height: 66px;
@@ -578,7 +618,7 @@ body .container.body .right_col {
 .navbar-nav>li>a,
 .navbar-brand,
 .navbar-nav>li>a {
-    color: #fff !important
+    color: #fff
 }
 
 .top_nav .nav>li>a:focus,
@@ -967,7 +1007,6 @@ a:focus {
 .navbar-brand,
 .navbar-nav>li>a {
     font-weight: 500;
-    color: #ECF0F1 !important;
     margin-left: 0 !important;
     line-height: 32px
 }
@@ -993,7 +1032,7 @@ a:focus {
 }
 
 .nav.navbar-nav>li>a {
-    color: #515356 !important
+    color: #515356
 }
 
 .nav.top_menu>li>a {
@@ -1075,6 +1114,10 @@ a:focus {
 
 .panel_toolbox>li>a:hover {
     background: #F5F7FA
+}
+
+.user-profile a {
+    color: black!important;
 }
 
 .line_30 {
