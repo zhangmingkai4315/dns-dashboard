@@ -198,7 +198,7 @@ function tickNetworkFormatter(bps) {
         } else if (v > (1024)) {
             return (v / (1024)).toFixed(0) + (bps ? "Kbps" : "Kpps");
         } else {
-            return v + (bps ? "bps" : "pps");
+            return v.toFixed(0) + (bps ? "bps" : "pps");
         }
     }
 }

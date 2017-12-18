@@ -2850,8 +2850,8 @@ a.btn-danger {
 }
 
 .btn-success {
-    background: #26B99A;
-    border: 1px solid #169F85
+    background: #2b3f54;
+    border: 1px solid #2b3f54;
 }
 
 .btn-success:hover,
@@ -2859,7 +2859,7 @@ a.btn-danger {
 .btn-success:active,
 .btn-success.active,
 .open .dropdown-toggle.btn-success {
-    background: #169F85
+    background: #1e2c3a;
 }
 
 .btn-dark {
@@ -4107,6 +4107,10 @@ ul.project_files li a i {
 
 .login {
     background: #F7F7F7
+}
+
+.login .nav.navbar-nav>li>a {
+    color: white!important;
 }
 
 .login .fa-paw {
