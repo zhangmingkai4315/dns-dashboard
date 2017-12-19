@@ -8,6 +8,17 @@ var dataStore = {
     "networkRecvPacket": {},
     "lastNetworkValue": []
 }
+var showNotify = _.throttle(function(message) {
+    new PNotify({
+        title: message.title,
+        styling: message.styling || 'bootstrap3',
+        type: message.type || "error",
+        text: message.text || '服务暂时无法访问，请稍后再试'
+    });
+    return
+}, 10000)
+
+var show
 
 var initStatus = {
     networkInitStatus: 0,
@@ -691,7 +702,7 @@ $(document).ready(function() { 
         url: "/dns_init_status",
         success: function(data) {
             if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
-                new PNotify({
+                showNotify({
                     title: '错误提示',
                     styling: 'bootstrap3',
                     type: "error",
@@ -702,7 +713,7 @@ $(document).ready(function() { 
             parseInitDNSStatus(data['data'])
         },
         error: function(error) {
-            new PNotify({
+            showNotify({
                 title: '错误提示',
                 styling: 'bootstrap3',
                 type: "error",
@@ -710,7 +721,7 @@ $(document).ready(function() { 
             });
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        new PNotify({
+        showNotify({
             title: '错误提示',
             styling: 'bootstrap3',
             type: "error",
@@ -723,7 +734,7 @@ $(document).ready(function() { 
             url: "/status",
             success: function(data) {
                 if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
-                    new PNotify({
+                    showNotify({
                         title: '数据获取失败',
                         styling: 'bootstrap3',
                         type: "error",
@@ -734,7 +745,7 @@ $(document).ready(function() { 
                 parseStatusData(data['data'])
             },
             error: function(error) {
-                new PNotify({
+                showNotify({
                     title: '错误提示',
                     styling: 'bootstrap3',
                     type: "error",
@@ -742,7 +753,7 @@ $(document).ready(function() { 
                 });
             }
         }).fail(function() {
-            new PNotify({
+            showNotify({
                 title: '错误提示',
                 styling: 'bootstrap3',
                 type: "error",
@@ -754,7 +765,7 @@ $(document).ready(function() { 
             url: "/dns_lastest_status",
             success: function(data) {
                 if (typeof data !== "object" || typeof data['data'] !== 'object' || data['error'] !== '') {
-                    new PNotify({
+                    showNotify({
                         title: '错误提示',
                         styling: 'bootstrap3',
                         type: "error",
@@ -766,7 +777,8 @@ $(document).ready(function() { 
                 UpdateTopStatus(data['data'])
             },
             error: function(error) {
-                new PNotify({
+                showNotify({})
+                showNotify({
                     title: '错误提示',
                     styling: 'bootstrap3',
                     type: "error",
@@ -775,7 +787,7 @@ $(document).ready(function() { 
             }
 
         }).fail(function(jqXHR, textStatus, errorThrown) {
-            new PNotify({
+            showNotify({
                 title: '错误提示',
                 styling: 'bootstrap3',
                 type: "error",
